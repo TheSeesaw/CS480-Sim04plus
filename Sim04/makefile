@@ -1,10 +1,10 @@
 CC = gcc
 DEBUG = -g
 CFLAGS = -Wall -std=c99 -c $(DEBUG)
-LFLAGS = -Wall $(DEBUG)
+LFLAGS = -Wall -std=c99 $(DEBUG)
 
 sim03 : main.o configReader.o programReader.o helperFunctions.o pcbUtils.o
-	$(CC) $(LFLAGS) main.o configReader.o programReader.o helperFunctions.o pcbUtils.o -o sim03
+	$(CC) $(LFLAGS) main.o configReader.o programReader.o helperFunctions.o pcbUtils.o -lpthread -o sim03
 
 main.o : main.c configReader.h programReader.h helperFunctions.h structures.h pcbUtils.h
 	$(CC) $(CFLAGS) main.c
