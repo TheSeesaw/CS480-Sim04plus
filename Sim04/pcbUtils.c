@@ -6,6 +6,7 @@
 // This function returns the number of PCBs that will be created from one file
 int getNumberOfPCBs(struct Action* theActions, int actionCount)
 {
+	
    // Initialize values for looping through actions
    int actionIndex = 0;
    int numPCBs = 0;
@@ -119,7 +120,140 @@ void organizeBySchedule(struct Config theData, int numProcesses, struct ProcessC
 {
    // initialize the array
    int sortArrayCount = 0;
+	/*
+	if (strcmp(theData.schCode, "RR-P") ==0)
+	{
+		int count,j,n,time,remaining,flag=0,quantum;
+		int wait_time=0, turnaround_time =0, rt[10], at[10], bt[10];
+		//n = getNumberOfPCBs()
+		remaining = n;
+		//getQuantum();
+		for(count = 0; count < n; count++)
+		{
+			
+		for(time =0; count =0, remaining > 0)
+		{
+			at[count] = getArrivalTime();
+			bt[count] = getBurstTime
+			rt[count] = bt[count];
+			if(rt[count] <= quantum && rt[count] >0)
+			{
+				time += rt[count];
+				rt[count] =0;
+				flag =1;
+			}
+			else if(rt[count] >0)
+			{
+				rt[count] -= quantum;
+				time += quantum;
+			}
+			if(rt[count] == 0 && flag==1)
+			{
+				remain--;
+				printf("P[%d]\t|\t%d\t|\t%d\n",count+1,time-at[count],time-at[count]-bt[count]);
+				wait_time += time - (at[count] -bt[count];
+				turnaround_time += (time -at[count];
+				flag=0;
+			}
+			if(count == n-1) count = 0;
+			else if(at[count+1] <=time) count++;
+		else{count = 0;}}
+	}	
+	
+	
+	SRTF-P:
+	
+	
+	{
 
+	
+//We may not need to use burst/arrival time, but we will need remaining time
+int at[10],bt[10],rt[10],endTime,i,smallest,processGantt[100];
+
+int remain=0,n,time,sum_wait=0,sum_turnaround=0;
+
+printf("Enter no of Processes : ");
+
+scanf("%d",&n);
+
+for(i=0;i<n;i++)
+
+{
+
+printf("Enter arrival time for Process P%d : ",i+1);
+
+scanf("%d",&at[i]);
+
+printf("Enter burst time for Process P%d : ",i+1);
+
+scanf("%d",&bt[i]);
+
+rt[i]=bt[i];
+
+}
+
+printf("\n\nProcess\t|Turnaround Time| Waiting Time\n\n");
+
+rt[9]=9999;
+
+for(time=0;remain!=n;time++)
+
+{
+
+smallest=9;
+
+for(i=0;i<n;i++)
+
+{
+
+if(at[i]<=time && rt[i]<rt[smallest] && rt[i]>0)
+
+{
+
+processGantt[time]=i;
+
+smallest=i;
+
+}
+
+}
+
+rt[smallest]--;
+
+if(rt[smallest]==0)
+
+{
+
+remain++;
+
+endTime=time+1;
+
+printf("\nP[%d]\t|\t%d\t|\t%d",smallest+1,endTime-at[smallest],endTime-bt[smallest]-at[smallest]);
+
+sum_wait+=endTime-bt[smallest]-at[smallest];
+
+sum_turnaround+=endTime-at[smallest];
+
+}
+
+}
+
+printf("\n\nAverage waiting time = %f\n",sum_wait*1.0/n);
+
+printf("Average Turnaround time = %f\n\n",sum_turnaround*1.0/5);
+
+for(i=0;i<=time;i++)
+
+{
+
+printf("%d->P%d ",i,processGantt[i]+1);
+
+}
+
+}
+	
+	
+	*/
    if (strcmp(theData.schCode, "SJF-N") == 0)
    {
       // Sort by shortest job first, nonpreemptive
