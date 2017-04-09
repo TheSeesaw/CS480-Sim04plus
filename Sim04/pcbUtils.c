@@ -1,12 +1,15 @@
 #include "structures.h"
+#include "helperFunctions.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <pthread.h>
 
+#define STD_TIMESTRING_SIZE 12
 // This function returns the number of PCBs that will be created from one file
 int getNumberOfPCBs(struct Action* theActions, int actionCount)
 {
-	
+
    // Initialize values for looping through actions
    int actionIndex = 0;
    int numPCBs = 0;
@@ -116,144 +119,11 @@ void initializePCBArray(int numProcesses, struct ProcessControlBlock* pcbArray, 
 
 // This function takes the pcb array, the config data, and an integer array wth size = number of PCBs
 // and sorts the ids of each pcb based on the scheduling code
-void organizeBySchedule(struct Config theData, int numProcesses, struct ProcessControlBlock* pcbDestination, int* orderDestination)
+void organizeByNSchedule(struct Config theData, int numProcesses, struct ProcessControlBlock* pcbDestination, int* orderDestination)
 {
    // initialize the array
    int sortArrayCount = 0;
-	/*
-	if (strcmp(theData.schCode, "RR-P") ==0)
-	{
-		int count,j,n,time,remaining,flag=0,quantum;
-		int wait_time=0, turnaround_time =0, rt[10], at[10], bt[10];
-		//n = getNumberOfPCBs()
-		remaining = n;
-		//getQuantum();
-		for(count = 0; count < n; count++)
-		{
-			
-		for(time =0; count =0, remaining > 0)
-		{
-			at[count] = getArrivalTime();
-			bt[count] = getBurstTime
-			rt[count] = bt[count];
-			if(rt[count] <= quantum && rt[count] >0)
-			{
-				time += rt[count];
-				rt[count] =0;
-				flag =1;
-			}
-			else if(rt[count] >0)
-			{
-				rt[count] -= quantum;
-				time += quantum;
-			}
-			if(rt[count] == 0 && flag==1)
-			{
-				remain--;
-				printf("P[%d]\t|\t%d\t|\t%d\n",count+1,time-at[count],time-at[count]-bt[count]);
-				wait_time += time - (at[count] -bt[count];
-				turnaround_time += (time -at[count];
-				flag=0;
-			}
-			if(count == n-1) count = 0;
-			else if(at[count+1] <=time) count++;
-		else{count = 0;}}
-	}	
-	
-	
-	SRTF-P:
-	
-	
-	{
 
-	
-//We may not need to use burst/arrival time, but we will need remaining time
-int at[10],bt[10],rt[10],endTime,i,smallest,processGantt[100];
-
-int remain=0,n,time,sum_wait=0,sum_turnaround=0;
-
-printf("Enter no of Processes : ");
-
-scanf("%d",&n);
-
-for(i=0;i<n;i++)
-
-{
-
-printf("Enter arrival time for Process P%d : ",i+1);
-
-scanf("%d",&at[i]);
-
-printf("Enter burst time for Process P%d : ",i+1);
-
-scanf("%d",&bt[i]);
-
-rt[i]=bt[i];
-
-}
-
-printf("\n\nProcess\t|Turnaround Time| Waiting Time\n\n");
-
-rt[9]=9999;
-
-for(time=0;remain!=n;time++)
-
-{
-
-smallest=9;
-
-for(i=0;i<n;i++)
-
-{
-
-if(at[i]<=time && rt[i]<rt[smallest] && rt[i]>0)
-
-{
-
-processGantt[time]=i;
-
-smallest=i;
-
-}
-
-}
-
-rt[smallest]--;
-
-if(rt[smallest]==0)
-
-{
-
-remain++;
-
-endTime=time+1;
-
-printf("\nP[%d]\t|\t%d\t|\t%d",smallest+1,endTime-at[smallest],endTime-bt[smallest]-at[smallest]);
-
-sum_wait+=endTime-bt[smallest]-at[smallest];
-
-sum_turnaround+=endTime-at[smallest];
-
-}
-
-}
-
-printf("\n\nAverage waiting time = %f\n",sum_wait*1.0/n);
-
-printf("Average Turnaround time = %f\n\n",sum_turnaround*1.0/5);
-
-for(i=0;i<=time;i++)
-
-{
-
-printf("%d->P%d ",i,processGantt[i]+1);
-
-}
-
-}
-	
-	
-	*/
    if (strcmp(theData.schCode, "SJF-N") == 0)
    {
       // Sort by shortest job first, nonpreemptive
@@ -308,4 +178,100 @@ printf("%d->P%d ",i,processGantt[i]+1);
          orderDestination[sortArrayCount] = sortArrayCount;
       }
    }
+}
+
+/*
+* This function is passed into a pthread so that it can perform i/o cycles
+*/
+void ioThreadRoutine(void* actionMSptr)
+{
+	int* actionMS;
+	// Convert the void pointer into an int
+	actionMS = (int*)actionMSptr;
+	// Busy cylce for an appropriate amount of time, dereference pointer
+	busyCycle(*actionMS);
+	// TODO: Here is where the signal function will be called
+	// Exit the thread
+	return;
+}
+
+/*
+* This function runs a program following a nonpreemptive schedule code
+* Note: This was refactored out of the main function for cleanliness
+*/
+void runProgramByNSchedule(struct ProcessControlBlock* pcbArray, int numPCBs, struct Config data, struct Action* actions, char* logString)
+{
+	int pcbCount, actionCount, actionMS;
+	int* pcbOrder = malloc(numPCBs * sizeof(int));
+
+	struct ProcessControlBlock currentPCB;
+	char* displayTime = malloc(STD_TIMESTRING_SIZE);
+	char* displayCommandString = malloc(STD_TIMESTRING_SIZE);
+	char* displayOpString = malloc(STD_TIMESTRING_SIZE);
+
+	organizeByNSchedule(data, numPCBs, pcbArray, pcbOrder);
+	pcbCount = 0;
+	for (; pcbCount < numPCBs; pcbCount++)
+	{
+
+		 // Select a PCB based on the pcbOrder
+		 currentPCB = pcbArray[pcbOrder[pcbCount]];
+		 // Set actionCount to the start index of the PCBs actions
+		 actionCount = currentPCB.startActionIndex;
+		 getTime(1, displayTime);
+		 if (strcmp(data.logTo, "Monitor") == 0 || strcmp(data.logTo, "Both") == 0)
+		 {
+				printf("Time:  %s, OS: %s scheduling has chosen Process %d with time: %d ms\n", displayTime, data.schCode, currentPCB.pNum, currentPCB.msToCompletion);
+		 }
+		 sprintf(logString + strlen(logString), "Time:  %s, OS: %s scheduling has chosen Process %d with time: %d ms\n", displayTime, data.schCode, currentPCB.pNum, currentPCB.msToCompletion);
+		 // Set the current process in running state, running = 2
+		 currentPCB.pState = 2;
+		 getTime(1, displayTime);
+		 if (strcmp(data.logTo, "Monitor") == 0 || strcmp(data.logTo, "Both") == 0)
+		 {
+				printf("Time:  %s, OS: Process %d set in Running State\n", displayTime, pcbOrder[pcbCount]);
+		 }
+		 sprintf(logString + strlen(logString), "Time:  %s, OS: Process %d set in Running State\n", displayTime, pcbOrder[pcbCount]);
+		 // Loop through each action in the PCB
+		 for (; actionCount <= currentPCB.endActionIndex; actionCount++)
+		 {
+				// Calculate the cycle time for the action
+				actionMS = calculateCycleTime(actions[actionCount], data.pTime, data.ioTime);
+				// Get operation string
+				displayOpString = actions[actionCount].operationString;
+				// Get appropriate displayCommandString
+				displayCommandString = getOperationString(actions[actionCount]);
+				// Thread if I/O operation
+				if (actions[actionCount].commandLetter == 'I' || actions[actionCount].commandLetter == 'O')
+				{
+					pthread_t io_thread;
+					// Pass in the address of the busyCycle function, as well as the address of actionMS
+					pthread_create (&io_thread, NULL, (void*) &ioThreadRoutine, (void*) &actionMS);
+					// Thread cycles
+					getTime(1, displayTime);
+				}
+				else
+				{
+					// Non I/O action, cycle normally
+					busyCycle(actionMS);
+				}
+				// Now print everything out
+				getTime(1, displayTime);
+				if (strcmp(data.logTo, "Monitor") == 0 || strcmp(data.logTo, "Both") == 0)
+				{
+					 printf("Time:  %s, Process %d, %s %s\n", displayTime, pcbOrder[pcbCount], displayOpString, displayCommandString);
+				}
+				sprintf(logString + strlen(logString), "Time:  %s, Process %d, %s %s\n", displayTime, pcbOrder[pcbCount], displayOpString, displayCommandString);
+		 }
+		 // Set PCB in exit state, state = 3
+		 currentPCB.pState = 3;
+		 getTime(1, displayTime);
+		 if (strcmp(data.logTo, "Monitor") == 0 || strcmp(data.logTo, "Both") == 0)
+		 {
+				printf("Time:  %s, OS: Process %d set in Exit State\n", displayTime, pcbOrder[pcbCount]);
+		 }
+		 sprintf(logString + strlen(logString), "Time:  %s, OS: Process %d set in Exit State\n", displayTime, pcbOrder[pcbCount]);
+
+	}
+
 }

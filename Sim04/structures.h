@@ -2,6 +2,7 @@
 #ifndef STRUCTURES_H
 #define STRUCTURES_H
 
+#define STD_I_QUEUE_LEN 10
 // Structure used to hold the data of an individual action from a program
 struct Action
 {
@@ -38,6 +39,12 @@ struct ProcessControlBlock
     int numAssociatedActions;
     int startActionIndex;
     int endActionIndex;
+};
+
+// Queue for holding interrupts
+struct IQueue
+{
+  void* queue[STD_I_QUEUE_LEN];
 };
 
 #endif

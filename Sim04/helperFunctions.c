@@ -207,3 +207,34 @@ void busyCycle(int targetTime)
    }
    // Clock has reached appropriate time
 }
+
+char* getOperationString(struct Action theAction)
+{
+  char* theString;
+  switch(theAction.commandLetter)
+  {
+     case 'M' :
+        // Memory
+        theString = "memory";
+        break;
+     case 'I' :
+        // Input
+        theString = "input";
+        break;
+     case 'O' :
+        // Output
+        theString = "output";
+        break;
+     case 'P' :
+        // Run Process
+        theString = "process";
+        break;
+     case 'A' :
+        // Run/End application
+        theString = "application";
+        break;
+     default:
+        printf("Glitch in the matrix.");
+  }
+  return theString;
+}

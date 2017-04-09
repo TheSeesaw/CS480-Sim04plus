@@ -1,0 +1,89 @@
+
+    Program testfilev02.mdf has been read successfully
+
+    Begin Simulation
+
+Time:  0000.000000, System start . . .
+Time:  0000.000003, OS: Begin PCB Creation
+Time:  0000.000009, OS: All processes initialized in New state
+Time:  0000.000013, OS: All processes set in Ready state
+Time:  0000.000024, OS: SJF-N scheduling has chosen Process 4 with time: 4100 ms
+Time:  0000.000026, OS: Process 4 set in Running State
+Time:  0000.001028, Process 4, start application
+Time:  0000.001064, Process 4, hard drive output
+Time:  0000.001083, Process 4, printer output
+Time:  0000.142086, Process 4, run process
+Time:  0000.233215, Process 4, run process
+Time:  0000.233442, Process 4, hard drive input
+Time:  0000.381347, Process 4, run process
+Time:  0000.381520, Process 4, printer output
+Time:  0000.381596, Process 4, hard drive output
+Time:  0000.381681, Process 4, hard drive input
+Time:  0000.432762, Process 4, run process
+Time:  0000.433914, Process 4, end application
+Time:  0000.433997, OS: Process 4 set in Exit State
+Time:  0000.434068, OS: SJF-N scheduling has chosen Process 3 with time: 4420 ms
+Time:  0000.434136, OS: Process 3 set in Running State
+Time:  0000.435204, Process 3, start application
+Time:  0000.566276, Process 3, run process
+Time:  0000.661394, Process 3, run process
+Time:  0000.661554, Process 3, printer output
+Time:  0000.661632, Process 3, hard drive input
+Time:  0000.661708, Process 3, hard drive output
+Time:  0000.661783, Process 3, keyboard input
+Time:  0000.792846, Process 3, run process
+Time:  0000.793067, Process 3, hard drive output
+Time:  0000.897436, Process 3, run process
+Time:  0000.897614, Process 3, hard drive input
+Time:  0000.898697, Process 3, end application
+Time:  0000.901474, OS: Process 3 set in Exit State
+Time:  0000.901537, OS: SJF-N scheduling has chosen Process 1 with time: 5280 ms
+Time:  0000.901598, OS: Process 1 set in Running State
+Time:  0000.902658, Process 1, start application
+Time:  0000.902752, Process 1, hard drive input
+Time:  0000.902831, Process 1, hard drive input
+Time:  0000.902926, Process 1, monitor output
+Time:  0000.961468, Process 1, run process
+Time:  0001.042499, Process 1, run process
+Time:  0001.042591, Process 1, hard drive input
+Time:  0001.042636, Process 1, hard drive input
+Time:  0001.042655, Process 1, printer output
+Time:  0001.042672, Process 1, keyboard input
+Time:  0001.157473, Process 1, run process
+Time:  0001.158513, Process 1, end application
+Time:  0001.158544, OS: Process 1 set in Exit State
+Time:  0001.158548, OS: SJF-N scheduling has chosen Process 2 with time: 9430 ms
+Time:  0001.158552, OS: Process 2 set in Running State
+Time:  0001.159555, Process 2, start application
+Time:  0001.177481, Process 2, access memory
+Time:  0001.177533, Process 2, printer output
+Time:  0001.177553, Process 2, printer output
+Time:  0001.177574, Process 2, hard drive input
+Time:  0001.177597, Process 2, hard drive output
+Time:  0001.177623, Process 2, printer output
+Time:  0001.308770, Process 2, run process
+Time:  0001.394008, Process 2, run process
+Time:  0001.394095, Process 2, keyboard input
+Time:  0001.394120, Process 2, keyboard input
+Time:  0001.394136, Process 2, hard drive input
+Time:  0001.395146, Process 2, end application
+Time:  0001.395156, OS: Process 2 set in Exit State
+Time:  0001.395159, OS: SJF-N scheduling has chosen Process 0 with time: 10610 ms
+Time:  0001.395161, OS: Process 0 set in Running State
+Time:  0001.396163, Process 0, start application
+Time:  0001.409286, Process 0, allocate memory
+Time:  0001.409330, Process 0, hard drive input
+Time:  0001.409345, Process 0, hard drive output
+Time:  0001.409359, Process 0, keyboard input
+Time:  0001.409375, Process 0, hard drive input
+Time:  0001.409392, Process 0, hard drive output
+Time:  0001.409413, Process 0, hard drive output
+Time:  0001.409428, Process 0, printer output
+Time:  0001.409444, Process 0, keyboard input
+Time:  0001.409463, Process 0, keyboard input
+Time:  0001.409490, Process 0, keyboard input
+Time:  0001.410493, Process 0, end application
+Time:  0001.410499, OS: Process 0 set in Exit State
+Time:  0001.410502, system stop
+
+    End Simulation

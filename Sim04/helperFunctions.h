@@ -5,3 +5,4 @@ int stringToInt(char * string);
 char * substring(char * string, int start, int end);
 void getTime(int operation, char* time_string);
 void busyCycle(int targetTime);
+char* getOperationString(struct Action theAction);

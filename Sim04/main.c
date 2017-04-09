@@ -3,6 +3,7 @@
 #include <string.h>
 #include <time.h>
 #include <sys/time.h>
+#include <pthread.h>
 #include "configReader.h"
 #include "programReader.h"
 #include "structures.h"
@@ -29,18 +30,12 @@ int main(int argc, char *argv[])
     int numActions;
     int programMessage;
     int pcbCount;
-    int actionCount;
-    int actionMS;
     int numPCBs;
-    int* pcbOrder;
 
     struct Config data;
     struct Action * actions;
     struct ProcessControlBlock* pcbArray;
-    struct ProcessControlBlock currentPCB;
 
-    char* displayCommandString = malloc(STD_TIMESTRING_SIZE);
-    char* displayOpString = malloc(STD_TIMESTRING_SIZE);
     char* logString = NULL;
 
     // Check if there are less than or more than two arguments passed
@@ -118,11 +113,6 @@ int main(int argc, char *argv[])
             }
             sprintf(logString + strlen(logString), "Time:  %s, OS: All processes initialized in New state\n", displayTime);
 
-            // Initialize pcbOrder array
-            pcbOrder = malloc(numPCBs * sizeof(int));
-            // Order the PCBs based on scheduling code
-            organizeBySchedule(data, numPCBs, pcbArray, pcbOrder);
-
             // Set PCBs in Ready state
             pcbCount = 0;
             for (; pcbCount < numPCBs; pcbCount++)
@@ -138,81 +128,18 @@ int main(int argc, char *argv[])
             sprintf(logString + strlen(logString), "Time:  %s, OS: All processes set in Ready state\n", displayTime);
 
             // Start running PCBs
-            pcbCount = 0;
-            for (; pcbCount < numPCBs; pcbCount++)
+            // Check scheduling code
+            if (strcmp(data.schCode, "FCFS-N") == 0 || strcmp(data.schCode, "SJF-N") == 0)
             {
-               // Select a PCB based on the pcbOrder
-               currentPCB = pcbArray[pcbOrder[pcbCount]];
-               // Set actionCount to the start index of the PCBs actions
-               actionCount = currentPCB.startActionIndex;
-               //TODO Have separate thread handle IO ops
-               getTime(1, displayTime);
-               if (strcmp(data.logTo, "Monitor") == 0 || strcmp(data.logTo, "Both") == 0)
-               {
-                  printf("Time:  %s, OS: %s scheduling has chosen Process %d with time: %d ms\n", displayTime, data.schCode, currentPCB.pNum, currentPCB.msToCompletion);
-               }
-               sprintf(logString + strlen(logString), "Time:  %s, OS: %s scheduling has chosen Process %d with time: %d ms\n", displayTime, data.schCode, currentPCB.pNum, currentPCB.msToCompletion);
-               // Set the current process in running state, running = 2
-               currentPCB.pState = 2;
-               getTime(1, displayTime);
-               if (strcmp(data.logTo, "Monitor") == 0 || strcmp(data.logTo, "Both") == 0)
-               {
-                  printf("Time:  %s, OS: Process %d set in Running State\n", displayTime, pcbOrder[pcbCount]);
-               }
-               sprintf(logString + strlen(logString), "Time:  %s, OS: Process %d set in Running State\n", displayTime, pcbOrder[pcbCount]);
-               // Loop through each action in the PCB
-               for (; actionCount <= currentPCB.endActionIndex; actionCount++)
-               {
-                  // Calculate the cycle time for the action
-                  actionMS = calculateCycleTime(actions[actionCount], data.pTime, data.ioTime);
-                  // Get operation string
-                  displayOpString = actions[actionCount].operationString;
-                  // Get appropriate displayCommandString
-                  switch(actions[actionCount].commandLetter)
-                  {
-                     case 'M' :
-                        // Memory
-                        displayCommandString = "memory";
-                        break;
-                     case 'I' :
-                        // Input
-                        displayCommandString = "input";
-                        break;
-                     case 'O' :
-                        // Output
-                        displayCommandString = "output";
-                        break;
-                     case 'P' :
-                        // Run Process
-                        displayCommandString = "process";
-                        break;
-                     case 'A' :
-                        // Run/End application
-                        displayCommandString = "application";
-                        break;
-                     default:
-                        printf("Glitch in the matrix.");
-                  }
-                  // Now print everything out
-                  busyCycle(actionMS);
-                  getTime(1, displayTime);
-                  if (strcmp(data.logTo, "Monitor") == 0 || strcmp(data.logTo, "Both") == 0)
-                  {
-                     printf("Time:  %s, Process %d, %s %s\n", displayTime, pcbOrder[pcbCount], displayOpString, displayCommandString);
-                  }
-                  sprintf(logString + strlen(logString), "Time:  %s, Process %d, %s %s\n", displayTime, pcbOrder[pcbCount], displayOpString, displayCommandString);
-               }
-               // Set PCB in exit state, state = 3
-               currentPCB.pState = 3;
-               getTime(1, displayTime);
-               if (strcmp(data.logTo, "Monitor") == 0 || strcmp(data.logTo, "Both") == 0)
-               {
-                  printf("Time:  %s, OS: Process %d set in Exit State\n", displayTime, pcbOrder[pcbCount]);
-               }
-               sprintf(logString + strlen(logString), "Time:  %s, OS: Process %d set in Exit State\n", displayTime, pcbOrder[pcbCount]);
+              // Run pcbs using a nonpreemptive routine
+              runProgramByNSchedule(pcbArray, numPCBs, data, actions, logString);
             }
-            // Done with PCBs, increment actionCount and print last system message
-            actionCount++;
+            else // Run using a preemptive routine
+            {
+              //runProgramByPSchedule(pcbArray, numPCBs, data, actions, logString);
+            }
+
+            // Done with PCBs, print last system message
             getTime(1,displayTime);
             if (strcmp(data.logTo, "Monitor") == 0 || strcmp(data.logTo, "Both") == 0)
             {
